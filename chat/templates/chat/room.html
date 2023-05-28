@@ -10,6 +10,7 @@
     <input id="chat-message-input" type="text" size="100"><br>
     <input id="chat-message-submit" type="button" value="Send">
     {{ room_name|json_script:"room-name" }}
+    <p><span id="active-users-count"></span></p>
     <script>
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
@@ -46,6 +47,22 @@
                 'name': name,
             }));
             messageInputDom.value = '';
+        };
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if (data.name && data.message) {
+                document.querySelector('#chat-log').value += (data.name + ': ' + data.message + '\n');
+            }
+        };
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if (data.name && data.message) {
+                document.querySelector('#chat-log').value += (data.name + ': ' + data.message + '\n');
+            } else if (data.active_users !== undefined) {
+                const activeUsersCount = data.active_users;
+                document.querySelector('#active-users-count').textContent = 'Active users: ' + activeUsersCount;
+            }
         };
     </script>
 </body>
